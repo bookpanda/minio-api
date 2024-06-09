@@ -1,5 +1,7 @@
 package file
 
+import "go.uber.org/zap"
+
 type Service interface {
 	Upload()
 	Delete()
@@ -7,13 +9,14 @@ type Service interface {
 }
 
 type serviceImpl struct {
-	repo Repository
-	// logger *zap.Logger
+	repo   Repository
+	logger *zap.Logger
 }
 
-func NewService(repo Repository) Service {
+func NewService(repo Repository, logger *zap.Logger) Service {
 	return &serviceImpl{
-		repo: repo,
+		repo:   repo,
+		logger: logger,
 	}
 }
 

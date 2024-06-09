@@ -23,7 +23,9 @@ func NewRepository(conf config.StoreConfig, minioClient *minio.Client) Repositor
 	}
 }
 
-func (r *repositoryImpl) Upload() {}
+func (r *repositoryImpl) Upload() {
+	// r.minio.
+}
 
 func (r *repositoryImpl) Delete() {}
 
