@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -50,7 +50,7 @@ func main() {
 	v1 := r.Group("/v1")
 
 	if conf.App.IsDevelopment() {
-		v1.GET("/docs/*", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 	v1.GET("/hc", hcHandler.HealthCheck)
 	v1.GET("/file/get", fileHdr.Get)
