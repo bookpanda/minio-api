@@ -10,7 +10,7 @@ import (
 
 type AppMidddleware gin.HandlerFunc
 
-func NewAppMiddleware(conf *config.Config) AppMidddleware {
+func NewAppMiddleware(conf *config.AppConfig) AppMidddleware {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -26,7 +26,7 @@ func NewAppMiddleware(conf *config.Config) AppMidddleware {
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		if token != conf.App.ApiKey {
+		if token != conf.ApiKey {
 			errors.ResponseError(c, errors.InvalidToken)
 			c.Abort()
 			return

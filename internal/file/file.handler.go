@@ -1,11 +1,14 @@
 package file
 
-import "go.uber.org/zap"
+import (
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+)
 
 type Handler interface {
-	Upload()
-	Delete()
-	Get()
+	Upload(c *gin.Context)
+	Delete(c *gin.Context)
+	Get(c *gin.Context)
 }
 
 type handlerImpl struct {
@@ -20,8 +23,8 @@ func NewHandler(svc Service, logger *zap.Logger) Handler {
 	}
 }
 
-func (r *handlerImpl) Upload() {}
+func (r *handlerImpl) Upload(c *gin.Context) {}
 
-func (r *handlerImpl) Delete() {}
+func (r *handlerImpl) Delete(c *gin.Context) {}
 
-func (r *handlerImpl) Get() {}
+func (r *handlerImpl) Get(c *gin.Context) {}

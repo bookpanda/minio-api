@@ -5,6 +5,9 @@ import (
 
 	"github.com/bookpanda/minio-api/config"
 	"github.com/bookpanda/minio-api/internal/file"
+	healthcheck "github.com/bookpanda/minio-api/internal/health_check"
+	"github.com/bookpanda/minio-api/internal/middleware"
+	"github.com/bookpanda/minio-api/internal/router"
 	"github.com/bookpanda/minio-api/logger"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -22,8 +25,19 @@ func main() {
 	})
 
 	logger := logger.New(conf)
+	corsHandler := config.MakeCorsConfig(conf)
+	appMiddleware := middleware.NewAppMiddleware(&conf.App)
+
+	hcHandler := healthcheck.NewHandler()
 
 	fileRepo := file.NewRepository(conf.Store, minioClient)
 	fileSvc := file.NewService(fileRepo, logger)
 	fileHdr := file.NewHandler(fileSvc, logger)
+
+	r := router.New(conf, corsHandler, appMiddleware)
+
+	r.GET("/hc", hcHandler.HealthCheck)
+	r.GET("/get", fileHdr.Get)
+	r.POST("/upload", fileHdr.Upload)
+	r.DELETE("/delete", fileHdr.Delete)
 }
