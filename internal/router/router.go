@@ -13,6 +13,8 @@ type Router struct {
 func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware middleware.AppMidddleware) *Router {
 	if !conf.App.IsDevelopment() {
 		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
 	}
 
 	r := gin.Default()
