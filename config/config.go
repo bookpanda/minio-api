@@ -20,8 +20,8 @@ type StoreConfig struct {
 }
 
 type Config struct {
-	AppConfig   AppConfig
-	StoreConfig StoreConfig
+	App   AppConfig
+	Store StoreConfig
 }
 
 func LoadConfig() (*Config, error) {
@@ -43,8 +43,8 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		AppConfig:   appConfig,
-		StoreConfig: storeConfig,
+		App:   appConfig,
+		Store: storeConfig,
 	}, nil
 }
 
