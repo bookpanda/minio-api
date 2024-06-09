@@ -19,9 +19,14 @@ type StoreConfig struct {
 	UseSSL    bool
 }
 
+type CorsConfig struct {
+	AllowOrigins string
+}
+
 type Config struct {
 	App   AppConfig
 	Store StoreConfig
+	Cors  CorsConfig
 }
 
 func LoadConfig() (*Config, error) {
@@ -35,6 +40,7 @@ func LoadConfig() (*Config, error) {
 		Env:    os.Getenv("APP_ENV"),
 		ApiKey: os.Getenv("APP_API_KEY"),
 	}
+
 	storeConfig := StoreConfig{
 		Endpoint:  os.Getenv("STORE_ENDPOINT"),
 		AccessKey: os.Getenv("STORE_ACCESS_KEY"),
@@ -42,9 +48,14 @@ func LoadConfig() (*Config, error) {
 		UseSSL:    os.Getenv("STORE_USE_SSL") == "true",
 	}
 
+	corsConfig := CorsConfig{
+		AllowOrigins: os.Getenv("CORS_ORIGINS"),
+	}
+
 	return &Config{
 		App:   appConfig,
 		Store: storeConfig,
+		Cors:  corsConfig,
 	}, nil
 }
 
