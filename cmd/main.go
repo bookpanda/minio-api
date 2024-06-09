@@ -5,6 +5,7 @@ import (
 
 	"github.com/bookpanda/minio-api/config"
 	"github.com/bookpanda/minio-api/internal/file"
+	"github.com/bookpanda/minio-api/logger"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -20,6 +21,9 @@ func main() {
 		Secure: conf.Store.UseSSL,
 	})
 
+	logger := logger.New(conf)
+
 	fileRepo := file.NewRepository(conf.Store, minioClient)
-	fileSvc := file.NewService(fileRepo)
+	fileSvc := file.NewService(fileRepo, logger)
+	fileHdr := file.NewHandler(fileSvc, logger)
 }
