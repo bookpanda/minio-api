@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/bookpanda/minio-api/config"
+	_ "github.com/bookpanda/minio-api/docs"
 	"github.com/bookpanda/minio-api/internal/middleware"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
