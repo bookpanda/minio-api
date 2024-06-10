@@ -10,7 +10,7 @@ import (
 )
 
 type DtoValidator interface {
-	Validate(interface{}) []string
+	Validate(interface{}) (errors []string)
 }
 
 type dtoValidatorImpl struct {
@@ -38,15 +38,13 @@ func NewDtoValidator() (DtoValidator, error) {
 	}, nil
 }
 
-func (v *dtoValidatorImpl) Validate(dto interface{}) []string {
-	var errs []string
-
+func (v *dtoValidatorImpl) Validate(dto interface{}) (errors []string) {
 	err := v.v.Struct(dto)
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
-			errs = append(errs, e.Translate(v.trans))
+			errors = append(errors, e.Translate(v.trans))
 		}
 	}
 
-	return errs
+	return errors
 }
