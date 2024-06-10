@@ -8,7 +8,8 @@ type UploadFileRequest struct {
 }
 
 type UploadFileResponse struct {
-	Success bool `json:"success"`
+	Url string `json:"url"`
+	Key string `json:"key"`
 }
 
 type DeleteFileRequest struct {
