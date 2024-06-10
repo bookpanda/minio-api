@@ -1,14 +1,20 @@
 package file
 
 import (
+	"bytes"
+	"context"
+	"fmt"
+	"time"
+
 	"github.com/bookpanda/minio-api/config"
 	"github.com/minio/minio-go/v7"
+	"github.com/pkg/errors"
 )
 
 type Repository interface {
-	Upload()
-	Delete()
-	Get()
+	Upload(file []byte, bucketName string, objectKey string) (string, string, error)
+	Delete(bucketName string, objectKey string) error
+	Get(bucketName string, objectKey string) string
 }
 
 type repositoryImpl struct {
@@ -23,10 +29,42 @@ func NewRepository(conf config.StoreConfig, minioClient *minio.Client) Repositor
 	}
 }
 
-func (r *repositoryImpl) Upload() {
-	// r.minio.
+func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string) (string, string, error) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	defer cancel()
+
+	buffer := bytes.NewReader(file)
+
+	uploadOutput, err := r.minio.PutObject(context.Background(), bucketName, objectKey, buffer,
+		buffer.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	if err != nil {
+		return "", "", errors.Wrap(err, fmt.Sprintf("Couldn't upload object to %v/%v.", bucketName, objectKey))
+	}
+
+	return r.getURL(bucketName, objectKey), uploadOutput.Key, nil
 }
 
-func (r *repositoryImpl) Delete() {}
+func (r *repositoryImpl) Delete(bucketName string, objectKey string) error {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	defer cancel()
 
-func (r *repositoryImpl) Get() {}
+	opts := minio.RemoveObjectOptions{
+		GovernanceBypass: true,
+	}
+	err := r.minio.RemoveObject(context.Background(), bucketName, objectKey, opts)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Couldn't delete object %v/%v.", bucketName, objectKey))
+	}
+
+	return nil
+}
+
+func (r *repositoryImpl) Get(bucketName string, objectKey string) string {
+	return r.getURL(bucketName, objectKey)
+}
+
+func (c *repositoryImpl) getURL(bucketName string, objectKey string) string {
+	return "https://" + c.conf.Endpoint + "/" + bucketName + "/" + objectKey
+}
