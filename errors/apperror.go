@@ -17,3 +17,15 @@ var (
 	BadRequest    = &AppError{"Bad request", http.StatusBadRequest}
 	InvalidToken  = &AppError{"Invalid token", http.StatusUnauthorized}
 )
+
+func BadRequestError(message string) *AppError {
+	return &AppError{message, http.StatusBadRequest}
+}
+
+func NotFoundError(message string) *AppError {
+	return &AppError{message, http.StatusNotFound}
+}
+
+func InternalServerError(message string) *AppError {
+	return &AppError{message, http.StatusInternalServerError}
+}
