@@ -15,6 +15,7 @@ import (
 	healthcheck "github.com/bookpanda/minio-api/internal/health_check"
 	"github.com/bookpanda/minio-api/internal/middleware"
 	"github.com/bookpanda/minio-api/internal/router"
+	"github.com/bookpanda/minio-api/internal/validator"
 	"github.com/bookpanda/minio-api/logger"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -34,6 +35,11 @@ func main() {
 		panic(fmt.Sprintf("Failed to connect to Minio: %v", err))
 	}
 
+	validator, err := validator.NewDtoValidator()
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create dto validator: %v", err))
+	}
+
 	logger := logger.New(conf)
 	corsHandler := config.MakeCorsConfig(conf)
 	appMiddleware := middleware.NewAppMiddleware(&conf.App)
@@ -42,7 +48,7 @@ func main() {
 
 	fileRepo := file.NewRepository(conf.Store, minioClient)
 	fileSvc := file.NewService(fileRepo, logger)
-	fileHdr := file.NewHandler(fileSvc, logger)
+	fileHdr := file.NewHandler(fileSvc, validator, logger)
 
 	r := router.New(conf, corsHandler, appMiddleware)
 
