@@ -10,7 +10,7 @@ type Router struct {
 	*gin.Engine
 }
 
-func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware middleware.AppMidddleware) *Router {
+func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware middleware.AppMiddleware) *Router {
 	if !conf.App.IsDevelopment() {
 		gin.SetMode(gin.ReleaseMode)
 	} else {

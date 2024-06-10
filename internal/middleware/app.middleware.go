@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"strings"
 
 	"github.com/bookpanda/minio-api/config"
@@ -8,10 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AppMidddleware gin.HandlerFunc
+type AppMiddleware gin.HandlerFunc
 
-func NewAppMiddleware(conf *config.AppConfig) AppMidddleware {
+func NewAppMiddleware(conf *config.AppConfig) AppMiddleware {
 	return func(c *gin.Context) {
+		path := c.Request.URL.Path
+		log.Default().Println("Request path: ", path)
+
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			errors.ResponseError(c, errors.Unauthorized)
