@@ -18,8 +18,6 @@ import (
 	"github.com/bookpanda/minio-api/logger"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -47,15 +45,11 @@ func main() {
 	fileHdr := file.NewHandler(fileSvc, logger)
 
 	r := router.New(conf, corsHandler, appMiddleware)
-	v1 := r.Group("/v1")
 
-	if conf.App.IsDevelopment() {
-		v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	}
-	v1.GET("/hc", hcHandler.HealthCheck)
-	v1.GET("/file/get", fileHdr.Get)
-	v1.POST("/file/upload", fileHdr.Upload)
-	v1.DELETE("/file/delete", fileHdr.Delete)
+	r.GetHealthCheck("/", hcHandler.HealthCheck)
+	r.GetFile("/get", fileHdr.Get)
+	r.PostFile("/upload", fileHdr.Upload)
+	r.DeleteFile("/delete", fileHdr.Delete)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%v", conf.App.Port),
