@@ -12,9 +12,9 @@ import (
 )
 
 type Repository interface {
-	Upload(file []byte, bucketName string, objectKey string) (string, string, error)
-	Delete(bucketName string, objectKey string) error
-	Get(bucketName string, objectKey string) string
+	Upload(file []byte, bucketName string, objectKey string) (url string, key string, err error)
+	Delete(bucketName string, objectKey string) (err error)
+	Get(bucketName string, objectKey string) (url string, err error)
 }
 
 type repositoryImpl struct {
@@ -29,7 +29,7 @@ func NewRepository(conf config.StoreConfig, minioClient *minio.Client) Repositor
 	}
 }
 
-func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string) (string, string, error) {
+func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string) (url string, key string, err error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
@@ -45,7 +45,7 @@ func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string
 	return r.getURL(bucketName, objectKey), uploadOutput.Key, nil
 }
 
-func (r *repositoryImpl) Delete(bucketName string, objectKey string) error {
+func (r *repositoryImpl) Delete(bucketName string, objectKey string) (err error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
@@ -53,7 +53,7 @@ func (r *repositoryImpl) Delete(bucketName string, objectKey string) error {
 	opts := minio.RemoveObjectOptions{
 		GovernanceBypass: true,
 	}
-	err := r.minio.RemoveObject(context.Background(), bucketName, objectKey, opts)
+	err = r.minio.RemoveObject(context.Background(), bucketName, objectKey, opts)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("Couldn't delete object %v/%v.", bucketName, objectKey))
 	}
@@ -61,8 +61,17 @@ func (r *repositoryImpl) Delete(bucketName string, objectKey string) error {
 	return nil
 }
 
-func (r *repositoryImpl) Get(bucketName string, objectKey string) string {
-	return r.getURL(bucketName, objectKey)
+func (r *repositoryImpl) Get(bucketName string, objectKey string) (url string, err error) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	defer cancel()
+
+	_, err = r.minio.StatObject(ctx, bucketName, objectKey, minio.StatObjectOptions{})
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("Couldn't get object %v/%v.", bucketName, objectKey))
+	}
+
+	return r.getURL(bucketName, objectKey), nil
 }
 
 func (c *repositoryImpl) getURL(bucketName string, objectKey string) string {
