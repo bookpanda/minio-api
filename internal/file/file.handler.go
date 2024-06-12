@@ -2,10 +2,12 @@ package file
 
 import (
 	"net/http"
-	"strings"
 
+	"github.com/bookpanda/minio-api/constants"
 	"github.com/bookpanda/minio-api/errors"
 	"github.com/bookpanda/minio-api/internal/dto"
+	"github.com/bookpanda/minio-api/internal/model"
+	"github.com/bookpanda/minio-api/internal/utils"
 	"github.com/bookpanda/minio-api/internal/validator"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -18,32 +20,64 @@ type Handler interface {
 }
 
 type handlerImpl struct {
-	svc      Service
-	validate validator.DtoValidator
-	log      *zap.Logger
+	svc         Service
+	validate    validator.DtoValidator
+	maxFileSize int64
+	log         *zap.Logger
 }
 
-func NewHandler(svc Service, validate validator.DtoValidator, log *zap.Logger) Handler {
+func NewHandler(svc Service, validate validator.DtoValidator, maxFileSize int64, log *zap.Logger) Handler {
 	return &handlerImpl{
-		svc:      svc,
-		validate: validate,
-		log:      log,
+		svc:         svc,
+		validate:    validate,
+		maxFileSize: maxFileSize,
+		log:         log,
 	}
 }
 
 func (h *handlerImpl) Upload(c *gin.Context) {
-	req := &dto.UploadFileRequest{}
-	if err := c.BindJSON(req); err != nil {
+	bucket := c.PostForm("bucket")
+	if bucket == "" {
+		errors.ResponseError(c, errors.BadRequestError("bucket is required"))
+		return
+	}
+
+	name := c.PostForm("name")
+	if name == "" {
+		errors.ResponseError(c, errors.BadRequestError("name is required"))
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
 		errors.ResponseError(c, errors.BadRequest)
 		return
 	}
 
-	if errorList := h.validate.Validate(req); errorList != nil {
-		errors.ResponseError(c, errors.BadRequestError(strings.Join(errorList, ", ")))
+	data, err := utils.ExtractFile(file, constants.AllowContentType, h.maxFileSize)
+	if err != nil {
+		errors.ResponseError(c, errors.InternalServerError(err.Error()))
 		return
 	}
 
-	res, err := h.svc.Upload(c, *req)
+	// if err := c.BindJSON(req); err != nil {
+	// 	errors.ResponseError(c, errors.BadRequest)
+	// 	return
+	// }
+
+	// if errorList := h.validate.Validate(req); errorList != nil {
+	// 	errors.ResponseError(c, errors.BadRequestError(strings.Join(errorList, ", ")))
+	// 	return
+	// }
+	req := &dto.UploadFileRequest{
+		Bucket: bucket,
+		File: model.File{
+			Name: name,
+			Data: data,
+		},
+	}
+
+	res, err := h.svc.Upload(c, req)
 	if err != nil {
 		errors.ResponseError(c, errors.InternalServerError(err.Error()))
 		return
