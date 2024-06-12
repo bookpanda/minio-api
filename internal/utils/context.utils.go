@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"strings"
 )
 
 func ExtractFile(file *multipart.FileHeader, allowContent map[string]struct{}, maxSize int64) (data []byte, err error) {
 	if !isExisted(allowContent, file.Header["Content-Type"][0]) {
-		return nil, errors.New("Not allowed content")
+		return nil, errors.New("Allowed content type is " + fmt.Sprint(strings.Join(mapToArr(allowContent), ", ")))
 	}
 
 	if file.Size > maxSize {
@@ -38,4 +39,12 @@ func isExisted(e map[string]struct{}, key string) bool {
 		return true
 	}
 	return false
+}
+
+func mapToArr(m map[string]struct{}) []string {
+	var arr []string
+	for k := range m {
+		arr = append(arr, k)
+	}
+	return arr
 }

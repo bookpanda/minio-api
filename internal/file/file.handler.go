@@ -50,7 +50,7 @@ func (h *handlerImpl) Upload(c *gin.Context) {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		errors.ResponseError(c, errors.BadRequest)
+		errors.ResponseError(c, errors.BadRequestError("file is required"))
 		return
 	}
 
