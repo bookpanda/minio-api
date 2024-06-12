@@ -48,7 +48,7 @@ func main() {
 
 	fileRepo := file.NewRepository(conf.Store, minioClient)
 	fileSvc := file.NewService(fileRepo, logger)
-	fileHdr := file.NewHandler(fileSvc, validator, logger)
+	fileHdr := file.NewHandler(fileSvc, validator, conf.App.MaxFileSize, logger)
 
 	r := router.New(conf, corsHandler, appMiddleware)
 
