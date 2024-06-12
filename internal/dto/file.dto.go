@@ -3,7 +3,7 @@ package dto
 import "github.com/bookpanda/minio-api/internal/model"
 
 type UploadFileRequest struct {
-	Bucket string     `json:"name"`
+	Bucket string     `json:"bucket"`
 	File   model.File `json:"file"`
 }
 
@@ -13,8 +13,8 @@ type UploadFileResponse struct {
 }
 
 type DeleteFileRequest struct {
-	Bucket string `json:"name"`
-	FileId string `json:"fileId"`
+	Bucket string `json:"name" validate:"required,min=3,max=50"`
+	FileId string `json:"fileId" validate:"required,min=3,max=50"`
 }
 
 type DeleteFileResponse struct {
@@ -22,8 +22,8 @@ type DeleteFileResponse struct {
 }
 
 type GetFileRequest struct {
-	Bucket string `json:"name"`
-	FileId string `json:"fileId"`
+	Bucket string `json:"name" validate:"required,min=3,max=50"`
+	FileId string `json:"fileId" validate:"required,min=3,max=50"`
 }
 
 type GetFileResponse struct {
