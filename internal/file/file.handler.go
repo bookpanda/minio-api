@@ -78,13 +78,13 @@ func (h *handlerImpl) Upload(c router.Context) {
 func (h *handlerImpl) Delete(c router.Context) {}
 
 func (h *handlerImpl) Get(c router.Context) {
-	bucket := c.Query("bucket")
+	bucket := c.Param("bucket")
 	if bucket == "" {
 		c.ResponseError(errors.BadRequestError("bucket is required"))
 		return
 	}
 
-	objectKey := c.Param("key")
+	objectKey := c.Query("key")
 	if objectKey == "" {
 		c.ResponseError(errors.BadRequestError("key is required"))
 		return
