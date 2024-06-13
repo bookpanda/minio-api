@@ -8,10 +8,10 @@ import (
 )
 
 type AppConfig struct {
-	Port        string
-	Env         string
-	ApiKey      string
-	MaxFileSize int64
+	Port          string
+	Env           string
+	ApiKey        string
+	MaxFileSizeMB int64
 }
 
 type StoreConfig struct {
@@ -37,15 +37,15 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	maxFileSize, err := strconv.ParseInt(os.Getenv("APP_MAX_FILE_SIZE"), 10, 64)
+	maxFileSizeMB, err := strconv.ParseInt(os.Getenv("APP_MAX_FILE_SIZE_MB"), 10, 64)
 	if err != nil {
 		return nil, err
 	}
 	appConfig := AppConfig{
-		Port:        os.Getenv("APP_PORT"),
-		Env:         os.Getenv("APP_ENV"),
-		ApiKey:      os.Getenv("APP_API_KEY"),
-		MaxFileSize: maxFileSize,
+		Port:          os.Getenv("APP_PORT"),
+		Env:           os.Getenv("APP_ENV"),
+		ApiKey:        os.Getenv("APP_API_KEY"),
+		MaxFileSizeMB: maxFileSizeMB,
 	}
 
 	storeConfig := StoreConfig{

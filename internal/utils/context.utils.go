@@ -14,7 +14,7 @@ func ExtractFile(file *multipart.FileHeader, allowedContent map[string]struct{},
 		return nil, errors.New("Allowed content type is " + fmt.Sprint(strings.Join(mapToArr(allowedContent), ", ")))
 	}
 
-	if file.Size > maxSize {
+	if file.Size > maxSize*1000000000 {
 		return nil, errors.New(fmt.Sprintf("Max file size is %v", maxSize))
 	}
 
