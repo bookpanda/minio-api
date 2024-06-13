@@ -24,7 +24,7 @@ func NewContext(c *gin.Context) Context {
 }
 
 func (c *contextImpl) JSON(statusCode int, obj interface{}) {
-	c.JSON(statusCode, obj)
+	c.Context.JSON(statusCode, obj)
 }
 
 func (c *contextImpl) ResponseError(err *errors.AppError) {
