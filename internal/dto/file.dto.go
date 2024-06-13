@@ -2,6 +2,11 @@ package dto
 
 import "github.com/bookpanda/minio-api/internal/model"
 
+type DecomposedFile struct {
+	Filename string
+	Data     []byte
+}
+
 type UploadFileRequest struct {
 	Bucket string     `json:"bucket"`
 	File   model.File `json:"file"`

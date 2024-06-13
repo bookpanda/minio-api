@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/bookpanda/minio-api/config"
@@ -14,20 +15,20 @@ func NewAppMiddleware(conf *config.AppConfig) AppMiddleware {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			errors.ResponseError(c, errors.Unauthorized)
+			c.JSON(http.StatusUnauthorized, errors.Unauthorized)
 			c.Abort()
 			return
 		}
 
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			errors.ResponseError(c, errors.InvalidToken)
+			c.JSON(http.StatusUnauthorized, errors.InvalidToken)
 			c.Abort()
 			return
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token != conf.ApiKey {
-			errors.ResponseError(c, errors.InvalidToken)
+			c.JSON(http.StatusUnauthorized, errors.InvalidToken)
 			c.Abort()
 			return
 		}

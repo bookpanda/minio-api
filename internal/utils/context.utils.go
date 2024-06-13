@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-func ExtractFile(file *multipart.FileHeader, allowContent map[string]struct{}, maxSize int64) (data []byte, err error) {
-	if !isExisted(allowContent, file.Header["Content-Type"][0]) {
-		return nil, errors.New("Allowed content type is " + fmt.Sprint(strings.Join(mapToArr(allowContent), ", ")))
+func ExtractFile(file *multipart.FileHeader, allowedContent map[string]struct{}, maxSize int64) (data []byte, err error) {
+	if !isExisted(allowedContent, file.Header["Content-Type"][0]) {
+		return nil, errors.New("Allowed content type is " + fmt.Sprint(strings.Join(mapToArr(allowedContent), ", ")))
 	}
 
 	if file.Size > maxSize {

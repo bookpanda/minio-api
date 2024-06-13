@@ -3,60 +3,54 @@ package file
 import (
 	"net/http"
 
-	"github.com/bookpanda/minio-api/constants"
 	"github.com/bookpanda/minio-api/errors"
 	"github.com/bookpanda/minio-api/internal/dto"
 	"github.com/bookpanda/minio-api/internal/model"
-	"github.com/bookpanda/minio-api/internal/utils"
+	"github.com/bookpanda/minio-api/internal/router"
 	"github.com/bookpanda/minio-api/internal/validator"
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type Handler interface {
-	Upload(c *gin.Context)
-	Delete(c *gin.Context)
-	Get(c *gin.Context)
+	Upload(c router.Context)
+	Delete(c router.Context)
+	Get(c router.Context)
 }
 
 type handlerImpl struct {
-	svc         Service
-	validate    validator.DtoValidator
-	maxFileSize int64
-	log         *zap.Logger
+	svc                Service
+	validate           validator.DtoValidator
+	maxFileSize        int64
+	allowedContentType map[string]struct{}
+	log                *zap.Logger
 }
 
-func NewHandler(svc Service, validate validator.DtoValidator, maxFileSize int64, log *zap.Logger) Handler {
+func NewHandler(svc Service, validate validator.DtoValidator, maxFileSize int64, allowedContentType map[string]struct{}, log *zap.Logger) Handler {
 	return &handlerImpl{
-		svc:         svc,
-		validate:    validate,
-		maxFileSize: maxFileSize,
-		log:         log,
+		svc:                svc,
+		validate:           validate,
+		maxFileSize:        maxFileSize,
+		allowedContentType: allowedContentType,
+		log:                log,
 	}
 }
 
-func (h *handlerImpl) Upload(c *gin.Context) {
+func (h *handlerImpl) Upload(c router.Context) {
 	bucket := c.PostForm("bucket")
 	if bucket == "" {
-		errors.ResponseError(c, errors.BadRequestError("bucket is required"))
+		c.ResponseError(errors.BadRequestError("bucket is required"))
 		return
 	}
 
 	name := c.PostForm("name")
 	if name == "" {
-		errors.ResponseError(c, errors.BadRequestError("name is required"))
+		c.ResponseError(errors.BadRequestError("name is required"))
 		return
 	}
 
-	file, err := c.FormFile("file")
+	file, err := c.FormFile("file", h.allowedContentType, h.maxFileSize)
 	if err != nil {
-		errors.ResponseError(c, errors.BadRequestError("file is required"))
-		return
-	}
-
-	data, err := utils.ExtractFile(file, constants.AllowContentType, h.maxFileSize)
-	if err != nil {
-		errors.ResponseError(c, errors.InternalServerError(err.Error()))
+		c.ResponseError(errors.BadRequestError(err.Error()))
 		return
 	}
 
@@ -72,20 +66,20 @@ func (h *handlerImpl) Upload(c *gin.Context) {
 	req := &dto.UploadFileRequest{
 		Bucket: bucket,
 		File: model.File{
-			Name: name,
-			Data: data,
+			Name: file.Filename,
+			Data: file.Data,
 		},
 	}
 
-	res, err := h.svc.Upload(c, req)
+	res, err := h.svc.Upload(req)
 	if err != nil {
-		errors.ResponseError(c, errors.InternalServerError(err.Error()))
+		c.ResponseError(errors.InternalServerError(err.Error()))
 		return
 	}
 
 	c.JSON(http.StatusOK, res)
 }
 
-func (h *handlerImpl) Delete(c *gin.Context) {}
+func (h *handlerImpl) Delete(c router.Context) {}
 
-func (h *handlerImpl) Get(c *gin.Context) {}
+func (h *handlerImpl) Get(c router.Context) {}

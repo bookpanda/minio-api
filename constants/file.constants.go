@@ -1,6 +1,6 @@
 package constants
 
-var AllowContentType = map[string]struct{}{
+var AllowedContentType = map[string]struct{}{
 	"image/jpeg": {},
 	"image/jpg":  {},
 	"image/png":  {},
