@@ -24,7 +24,7 @@ func NewService(repo Repository, log *zap.Logger) Service {
 }
 
 func (s *serviceImpl) Upload(req *dto.UploadFileRequest) (res *dto.UploadFileResponse, err error) {
-	objectKey := req.File.Name + "_" + req.File.ID.String()
+	objectKey := req.File.ID.String()[:8] + "_" + req.File.Name
 
 	url, key, err := s.repo.Upload(req.File.Data, req.Bucket, objectKey)
 	if err != nil {

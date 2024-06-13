@@ -42,12 +42,6 @@ func (h *handlerImpl) Upload(c router.Context) {
 		return
 	}
 
-	name := c.PostForm("name")
-	if name == "" {
-		c.ResponseError(errors.BadRequestError("name is required"))
-		return
-	}
-
 	file, err := c.FormFile("file", h.allowedContentType, h.maxFileSize)
 	if err != nil {
 		c.ResponseError(errors.BadRequestError(err.Error()))
@@ -67,7 +61,7 @@ func (h *handlerImpl) Upload(c router.Context) {
 		Bucket: bucket,
 		File: model.File{
 			ID:   c.NewUUID(),
-			Name: name,
+			Name: file.Filename,
 			Data: file.Data,
 		},
 	}
