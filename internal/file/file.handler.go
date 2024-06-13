@@ -66,7 +66,8 @@ func (h *handlerImpl) Upload(c router.Context) {
 	req := &dto.UploadFileRequest{
 		Bucket: bucket,
 		File: model.File{
-			Name: file.Filename,
+			ID:   c.NewUUID(),
+			Name: name,
 			Data: file.Data,
 		},
 	}

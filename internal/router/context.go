@@ -5,11 +5,13 @@ import (
 	"github.com/bookpanda/minio-api/internal/dto"
 	"github.com/bookpanda/minio-api/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Context interface {
 	JSON(statusCode int, obj interface{})
 	ResponseError(err *errors.AppError)
+	NewUUID() uuid.UUID
 	Bind(obj interface{}) error
 	PostForm(key string) string
 	FormFile(key string, allowedContentType map[string]struct{}, maxFileSize int64) (*dto.DecomposedFile, error)
@@ -29,6 +31,10 @@ func (c *contextImpl) JSON(statusCode int, obj interface{}) {
 
 func (c *contextImpl) ResponseError(err *errors.AppError) {
 	c.JSON(err.HttpCode, gin.H{"error": err.Error()})
+}
+
+func (c *contextImpl) NewUUID() uuid.UUID {
+	return uuid.New()
 }
 
 func (c *contextImpl) Bind(obj interface{}) error {
