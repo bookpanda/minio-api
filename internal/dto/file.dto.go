@@ -27,8 +27,8 @@ type DeleteFileResponse struct {
 }
 
 type GetFileRequest struct {
-	Bucket string `json:"name" validate:"required,min=3,max=50"`
-	FileId string `json:"fileId" validate:"required,min=3,max=50"`
+	Bucket  string `json:"name" validate:"required,min=3,max=50"`
+	FileKey string `json:"fileKey" validate:"required,min=3,max=50"`
 }
 
 type GetFileResponse struct {

@@ -13,6 +13,8 @@ type Context interface {
 	ResponseError(err *errors.AppError)
 	NewUUID() uuid.UUID
 	Bind(obj interface{}) error
+	Param(key string) string
+	Query(key string) string
 	PostForm(key string) string
 	FormFile(key string, allowedContentType map[string]struct{}, maxFileSize int64) (*dto.DecomposedFile, error)
 }
@@ -39,6 +41,14 @@ func (c *contextImpl) NewUUID() uuid.UUID {
 
 func (c *contextImpl) Bind(obj interface{}) error {
 	return c.Context.Bind(obj)
+}
+
+func (c *contextImpl) Param(key string) string {
+	return c.Context.Param(key)
+}
+
+func (c *contextImpl) Query(key string) string {
+	return c.Context.Query(key)
 }
 
 func (c *contextImpl) PostForm(key string) string {

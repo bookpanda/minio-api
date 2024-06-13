@@ -77,4 +77,29 @@ func (h *handlerImpl) Upload(c router.Context) {
 
 func (h *handlerImpl) Delete(c router.Context) {}
 
-func (h *handlerImpl) Get(c router.Context) {}
+func (h *handlerImpl) Get(c router.Context) {
+	bucket := c.Query("bucket")
+	if bucket == "" {
+		c.ResponseError(errors.BadRequestError("bucket is required"))
+		return
+	}
+
+	objectKey := c.Param("key")
+	if objectKey == "" {
+		c.ResponseError(errors.BadRequestError("key is required"))
+		return
+	}
+
+	req := &dto.GetFileRequest{
+		Bucket:  bucket,
+		FileKey: objectKey,
+	}
+
+	res, err := h.svc.Get(req)
+	if err != nil {
+		c.ResponseError(errors.InternalServerError(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}

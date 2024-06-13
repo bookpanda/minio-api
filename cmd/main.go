@@ -54,7 +54,7 @@ func main() {
 	r := router.New(conf, corsHandler, appMiddleware)
 
 	r.GetHealthCheck("/", hcHandler.HealthCheck)
-	r.GetFile("/get", fileHdr.Get)
+	r.GetFile("/get/:bucket", fileHdr.Get)
 	r.PostFile("/upload", fileHdr.Upload)
 	r.DeleteFile("/delete", fileHdr.Delete)
 

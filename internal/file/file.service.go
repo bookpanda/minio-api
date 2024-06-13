@@ -51,7 +51,7 @@ func (s *serviceImpl) Delete(req *dto.DeleteFileRequest) (res *dto.DeleteFileRes
 }
 
 func (s *serviceImpl) Get(req *dto.GetFileRequest) (res *dto.GetFileResponse, err error) {
-	url, err := s.repo.Get(req.Bucket, req.FileId)
+	url, err := s.repo.Get(req.Bucket, req.FileKey)
 	if err != nil {
 		s.log.Named("file svc").Error("Couldn't get object", zap.Error(err))
 		return nil, err
