@@ -80,13 +80,13 @@ func (h *handlerImpl) Delete(c router.Context) {}
 func (h *handlerImpl) Get(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {
-		c.ResponseError(errors.BadRequestError("bucket is required"))
+		c.ResponseError(errors.BadRequestError("bucket route parameter is required"))
 		return
 	}
 
 	objectKey := c.Query("key")
 	if objectKey == "" {
-		c.ResponseError(errors.BadRequestError("key is required"))
+		c.ResponseError(errors.BadRequestError("key query parameter is required"))
 		return
 	}
 
