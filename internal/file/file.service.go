@@ -1,6 +1,8 @@
 package file
 
 import (
+	"strings"
+
 	"github.com/bookpanda/minio-api/internal/dto"
 	"go.uber.org/zap"
 )
@@ -24,7 +26,7 @@ func NewService(repo Repository, log *zap.Logger) Service {
 }
 
 func (s *serviceImpl) Upload(req *dto.UploadFileRequest) (res *dto.UploadFileResponse, err error) {
-	objectKey := req.File.ID.String()[:8] + "_" + req.File.Name
+	objectKey := req.File.ID.String()[:8] + "_" + strings.ReplaceAll(req.File.Name, " ", "_")
 
 	url, key, err := s.repo.Upload(req.File.Data, req.Bucket, objectKey)
 	if err != nil {
