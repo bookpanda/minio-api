@@ -20,7 +20,7 @@ services:
       - STORE_USE_SSL=true
       - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
     networks:
-      - miniostage
+      - minio
 
 
 networks:

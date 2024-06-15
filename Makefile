@@ -4,6 +4,9 @@ watch:
 server:
 	go run cmd/main.go
 
+stage:
+	docker-compose -f docker-compose.stage.yaml up
+
 mock-gen:
 	mockgen -source ./internal/repository/file/file.repository.go -destination ./mocks/repository/file.repository.go
 	mockgen -source ./internal/service/file/file.service.go -destination ./mocks/service/file.service.go
