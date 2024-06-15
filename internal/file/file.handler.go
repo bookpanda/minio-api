@@ -2,6 +2,7 @@ package file
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/bookpanda/minio-api/errors"
 	"github.com/bookpanda/minio-api/internal/dto"
@@ -48,15 +49,6 @@ func (h *handlerImpl) Upload(c router.Context) {
 		return
 	}
 
-	// if err := c.BindJSON(req); err != nil {
-	// 	errors.ResponseError(c, errors.BadRequest)
-	// 	return
-	// }
-
-	// if errorList := h.validate.Validate(req); errorList != nil {
-	// 	errors.ResponseError(c, errors.BadRequestError(strings.Join(errorList, ", ")))
-	// 	return
-	// }
 	req := &dto.UploadFileRequest{
 		Bucket: bucket,
 		File: model.File{
@@ -74,8 +66,6 @@ func (h *handlerImpl) Upload(c router.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
-
-func (h *handlerImpl) Delete(c router.Context) {}
 
 func (h *handlerImpl) Get(c router.Context) {
 	bucket := c.Param("bucket")
@@ -96,6 +86,38 @@ func (h *handlerImpl) Get(c router.Context) {
 	}
 
 	res, err := h.svc.Get(req)
+	if err != nil {
+		c.ResponseError(errors.InternalServerError(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *handlerImpl) Delete(c router.Context) {
+	bucket := c.Param("bucket")
+	if bucket == "" {
+		c.ResponseError(errors.BadRequestError("bucket route parameter is required"))
+		return
+	}
+
+	body := &dto.DeleteFileRequestBody{}
+	if err := c.Bind(body); err != nil {
+		c.ResponseError(errors.BadRequestError(err.Error()))
+		return
+	}
+
+	if errorList := h.validate.Validate(body); errorList != nil {
+		c.ResponseError(errors.BadRequestError(strings.Join(errorList, ", ")))
+		return
+	}
+
+	req := &dto.DeleteFileRequest{
+		Bucket:  bucket,
+		FileKey: body.FileKey,
+	}
+
+	res, err := h.svc.Delete(req)
 	if err != nil {
 		c.ResponseError(errors.InternalServerError(err.Error()))
 		return

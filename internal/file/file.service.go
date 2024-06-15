@@ -35,13 +35,13 @@ func (s *serviceImpl) Upload(req *dto.UploadFileRequest) (res *dto.UploadFileRes
 	}
 
 	return &dto.UploadFileResponse{
-		Url: url,
-		Key: key,
+		Url:     url,
+		FileKey: key,
 	}, nil
 }
 
 func (s *serviceImpl) Delete(req *dto.DeleteFileRequest) (res *dto.DeleteFileResponse, err error) {
-	err = s.repo.Delete(req.Bucket, req.FileId)
+	err = s.repo.Delete(req.Bucket, req.FileKey)
 	if err != nil {
 		s.log.Named("file svc").Error("Couldn't delete object", zap.Error(err))
 		return nil, err

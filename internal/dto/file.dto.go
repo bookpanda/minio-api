@@ -13,13 +13,17 @@ type UploadFileRequest struct {
 }
 
 type UploadFileResponse struct {
-	Url string `json:"url"`
-	Key string `json:"key"`
+	Url     string `json:"url"`
+	FileKey string `json:"fileKey"`
+}
+
+type DeleteFileRequestBody struct {
+	FileKey string `json:"fileKey" validate:"required,min=3,max=50"`
 }
 
 type DeleteFileRequest struct {
-	Bucket string `json:"name" validate:"required,min=3,max=50"`
-	FileId string `json:"fileId" validate:"required,min=3,max=50"`
+	Bucket  string `json:"name"`
+	FileKey string `json:"fileKey"`
 }
 
 type DeleteFileResponse struct {
@@ -27,8 +31,8 @@ type DeleteFileResponse struct {
 }
 
 type GetFileRequest struct {
-	Bucket  string `json:"name" validate:"required,min=3,max=50"`
-	FileKey string `json:"fileKey" validate:"required,min=3,max=50"`
+	Bucket  string `json:"name"`
+	FileKey string `json:"fileKey"`
 }
 
 type GetFileResponse struct {
