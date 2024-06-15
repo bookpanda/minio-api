@@ -74,7 +74,7 @@ func (r *repositoryImpl) Get(bucketName string, objectKey string) (url string, e
 		return "", errors.Wrap(err, fmt.Sprintf("Couldn't get object %v/%v.", bucketName, objectKey))
 	}
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New(fmt.Sprintf("Object not found: %v/%v.", bucketName, objectKey))
+		return "", nil
 	}
 
 	return url, nil
