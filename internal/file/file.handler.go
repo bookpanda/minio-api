@@ -36,6 +36,19 @@ func NewHandler(svc Service, validate validator.DtoValidator, maxFileSize int64,
 	}
 }
 
+// Upload godoc
+// @Summary      Upload object to minio
+// @Description  get string by ID
+// @Tags         file
+// @Accept       mpfd
+// @Produce      json
+// @Param        bucket formData string true "Which bucket to upload to"
+// @Param        file formData file true "file to upload"
+// @Success      200  {object}  dto.UploadFileResponse
+// @Failure      400  {object}  errors.AppError
+// @Failure      401  {object}  errors.AppError
+// @Failure      500  {object}  errors.AppError
+// @Router       /api/v1/upload [post]
 func (h *handlerImpl) Upload(c router.Context) {
 	bucket := c.PostForm("bucket")
 	if bucket == "" {

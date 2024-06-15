@@ -12,10 +12,10 @@ func (e *AppError) Error() string {
 }
 
 var (
-	InternalError = &AppError{"Internal error", http.StatusInternalServerError}
-	Unauthorized  = &AppError{"Unauthorized", http.StatusUnauthorized}
-	BadRequest    = &AppError{"Bad request", http.StatusBadRequest}
-	InvalidToken  = &AppError{"Invalid token", http.StatusUnauthorized}
+	InternalServer = &AppError{"Internal error", http.StatusInternalServerError}
+	Unauthorized   = &AppError{"Unauthorized", http.StatusUnauthorized}
+	BadRequest     = &AppError{"Bad request", http.StatusBadRequest}
+	InvalidToken   = &AppError{"Invalid token", http.StatusUnauthorized}
 )
 
 func BadRequestError(message string) *AppError {

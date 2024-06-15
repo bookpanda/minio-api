@@ -1,9 +1,62 @@
 basePath: /api/v1
+definitions:
+  dto.UploadFileResponse:
+    properties:
+      fileKey:
+        type: string
+      url:
+        type: string
+    type: object
+  errors.AppError:
+    properties:
+      httpCode:
+        type: integer
+      id:
+        type: string
+    type: object
 host: minio.bookpanda.dev
 info:
   contact: {}
   description: Object store API for personal projects
   title: Minio API
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: get string by ID
+      parameters:
+      - description: Which bucket to upload to
+        in: formData
+        name: bucket
+        required: true
+        type: string
+      - description: file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UploadFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.AppError'
+      summary: Upload object to minio
+      tags:
+      - file
 swagger: "2.0"
