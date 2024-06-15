@@ -9,6 +9,8 @@ mock-gen:
 	mockgen -source ./internal/service/file/file.service.go -destination ./mocks/service/file.service.go
 	mockgen -source ./internal/client/http/http.client.go -destination ./mocks/client/http/http.client.go
 	mockgen -source ./internal/client/store/store.client.go -destination ./mocks/client/store/store.client.go
+	mockgen -source ./internal/router/context.go -destination ./mocks/router/context.go
+	mockgen -source ./internal/validator/validator.go -destination ./mocks/validator/validator.go
 
 test:
 	go vet ./...
