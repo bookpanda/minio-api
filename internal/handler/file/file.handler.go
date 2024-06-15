@@ -8,6 +8,7 @@ import (
 	"github.com/bookpanda/minio-api/internal/dto"
 	"github.com/bookpanda/minio-api/internal/model"
 	"github.com/bookpanda/minio-api/internal/router"
+	"github.com/bookpanda/minio-api/internal/service/file"
 	"github.com/bookpanda/minio-api/internal/validator"
 	"go.uber.org/zap"
 )
@@ -19,14 +20,14 @@ type Handler interface {
 }
 
 type handlerImpl struct {
-	svc                Service
+	svc                file.Service
 	validate           validator.DtoValidator
 	maxFileSize        int64
 	allowedContentType map[string]struct{}
 	log                *zap.Logger
 }
 
-func NewHandler(svc Service, validate validator.DtoValidator, maxFileSize int64, allowedContentType map[string]struct{}, log *zap.Logger) Handler {
+func NewHandler(svc file.Service, validate validator.DtoValidator, maxFileSize int64, allowedContentType map[string]struct{}, log *zap.Logger) Handler {
 	return &handlerImpl{
 		svc:                svc,
 		validate:           validate,

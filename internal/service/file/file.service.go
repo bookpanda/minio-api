@@ -6,6 +6,7 @@ import (
 
 	"github.com/bookpanda/minio-api/apperrors"
 	"github.com/bookpanda/minio-api/internal/dto"
+	"github.com/bookpanda/minio-api/internal/repository/file"
 	"go.uber.org/zap"
 )
 
@@ -16,11 +17,11 @@ type Service interface {
 }
 
 type serviceImpl struct {
-	repo Repository
+	repo file.Repository
 	log  *zap.Logger
 }
 
-func NewService(repo Repository, log *zap.Logger) Service {
+func NewService(repo file.Repository, log *zap.Logger) Service {
 	return &serviceImpl{
 		repo: repo,
 		log:  log,
