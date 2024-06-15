@@ -22,6 +22,12 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
+// @title           Minio API
+// @version         1.0
+// @description     Object store API for personal projects
+
+// @host      minio.bookpanda.dev
+// @BasePath  /api/v1
 func main() {
 	conf, err := config.LoadConfig()
 	if err != nil {

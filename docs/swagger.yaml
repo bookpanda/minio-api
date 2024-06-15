@@ -1,4 +1,9 @@
+basePath: /api/v1
+host: minio.bookpanda.dev
 info:
   contact: {}
+  description: Object store API for personal projects
+  title: Minio API
+  version: "1.0"
 paths: {}
 swagger: "2.0"
