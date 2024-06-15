@@ -22,7 +22,7 @@ type DeleteFileRequestBody struct {
 }
 
 type DeleteFileRequest struct {
-	Bucket  string `json:"name"`
+	Bucket  string `json:"bucket"`
 	FileKey string `json:"fileKey"`
 }
 

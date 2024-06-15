@@ -122,6 +122,20 @@ func (h *handlerImpl) Get(c router.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// Delete godoc
+// @Summary      Delete object from minio
+// @Description  specify the object's bucket and key to delete
+// @Tags         file
+// @Accept       json
+// @Produce      json
+// @Param        bucket path string true "Which bucket to delete object"
+// @Param        fileKey body dto.DeleteFileRequestBody true "object key to delete"
+// @Security     BearerAuth
+// @Success      200  {object}  dto.DeleteFileResponse
+// @Failure      400  {object}  apperrors.AppError
+// @Failure      401  {object}  apperrors.AppError
+// @Failure      500  {object}  apperrors.AppError
+// @Router       /file/delete/{bucket} [delete]
 func (h *handlerImpl) Delete(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {

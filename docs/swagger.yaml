@@ -7,6 +7,20 @@ definitions:
       id:
         type: string
     type: object
+  dto.DeleteFileRequestBody:
+    properties:
+      fileKey:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - fileKey
+    type: object
+  dto.DeleteFileResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   dto.GetFileResponse:
     properties:
       fileUrl:
@@ -26,6 +40,47 @@ info:
   title: Minio API
   version: "1.0"
 paths:
+  /file/delete/{bucket}:
+    delete:
+      consumes:
+      - application/json
+      description: specify the object's bucket and key to delete
+      parameters:
+      - description: Which bucket to delete object
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: object key to delete
+        in: body
+        name: fileKey
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteFileRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DeleteFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+      security:
+      - BearerAuth: []
+      summary: Delete object from minio
+      tags:
+      - file
   /file/get/{bucket}:
     get:
       consumes:
