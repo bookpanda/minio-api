@@ -12,10 +12,12 @@ import (
 
 	"github.com/bookpanda/minio-api/config"
 	"github.com/bookpanda/minio-api/constants"
-	"github.com/bookpanda/minio-api/internal/file"
+	fileHdr "github.com/bookpanda/minio-api/internal/handler/file"
 	healthcheck "github.com/bookpanda/minio-api/internal/health_check"
 	"github.com/bookpanda/minio-api/internal/middleware"
+	fileRepo "github.com/bookpanda/minio-api/internal/repository/file"
 	"github.com/bookpanda/minio-api/internal/router"
+	fileSvc "github.com/bookpanda/minio-api/internal/service/file"
 	"github.com/bookpanda/minio-api/internal/validator"
 	"github.com/bookpanda/minio-api/logger"
 	"github.com/minio/minio-go/v7"
@@ -57,9 +59,9 @@ func main() {
 
 	hcHandler := healthcheck.NewHandler()
 
-	fileRepo := file.NewRepository(conf.Store, minioClient)
-	fileSvc := file.NewService(fileRepo, logger)
-	fileHdr := file.NewHandler(fileSvc, validator, conf.App.MaxFileSizeMB, constants.AllowedContentType, logger)
+	fileRepo := fileRepo.NewRepository(conf.Store, minioClient)
+	fileSvc := fileSvc.NewService(fileRepo, logger)
+	fileHdr := fileHdr.NewHandler(fileSvc, validator, conf.App.MaxFileSizeMB, constants.AllowedContentType, logger)
 
 	r := router.New(conf, corsHandler, appMiddleware)
 
