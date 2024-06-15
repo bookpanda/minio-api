@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/bookpanda/minio-api/errors"
+	"github.com/bookpanda/minio-api/apperrors"
 	"github.com/bookpanda/minio-api/internal/dto"
 	"github.com/bookpanda/minio-api/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ import (
 
 type Context interface {
 	JSON(statusCode int, obj interface{})
-	ResponseError(err *errors.AppError)
+	ResponseError(err *apperrors.AppError)
 	NewUUID() uuid.UUID
 	Bind(obj interface{}) error
 	Param(key string) string
@@ -31,7 +31,7 @@ func (c *contextImpl) JSON(statusCode int, obj interface{}) {
 	c.Context.JSON(statusCode, obj)
 }
 
-func (c *contextImpl) ResponseError(err *errors.AppError) {
+func (c *contextImpl) ResponseError(err *apperrors.AppError) {
 	c.JSON(err.HttpCode, gin.H{"error": err.Error()})
 }
 
