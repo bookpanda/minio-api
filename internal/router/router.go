@@ -24,7 +24,7 @@ func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware midd
 
 	r := gin.Default()
 	r.Use(gin.HandlerFunc(corsHandler))
-	v1 := r.Group("/v1")
+	v1 := r.Group("/api/v1")
 
 	if conf.App.IsDevelopment() {
 		v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
