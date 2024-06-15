@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bookpanda/minio-api/config"
+	"github.com/bookpanda/minio-api/internal/client"
 	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
 )
@@ -19,14 +20,14 @@ type Repository interface {
 }
 
 type repositoryImpl struct {
-	conf  config.StoreConfig
-	minio *minio.Client
+	conf   *config.StoreConfig
+	client client.Client
 }
 
-func NewRepository(conf config.StoreConfig, minioClient *minio.Client) Repository {
+func NewRepository(conf *config.StoreConfig, client client.Client) Repository {
 	return &repositoryImpl{
-		conf:  conf,
-		minio: minioClient,
+		conf:   conf,
+		client: client,
 	}
 }
 
@@ -37,7 +38,7 @@ func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string
 
 	buffer := bytes.NewReader(file)
 
-	uploadOutput, err := r.minio.PutObject(context.Background(), bucketName, objectKey, buffer,
+	uploadOutput, err := r.client.PutObject(context.Background(), bucketName, objectKey, buffer,
 		buffer.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return "", "", errors.Wrap(err, fmt.Sprintf("Couldn't upload object to %v/%v.", bucketName, objectKey))
@@ -54,7 +55,7 @@ func (r *repositoryImpl) Delete(bucketName string, objectKey string) (err error)
 	opts := minio.RemoveObjectOptions{
 		GovernanceBypass: true,
 	}
-	err = r.minio.RemoveObject(context.Background(), bucketName, objectKey, opts)
+	err = r.client.RemoveObject(context.Background(), bucketName, objectKey, opts)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("Couldn't delete object %v/%v.", bucketName, objectKey))
 	}

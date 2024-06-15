@@ -12,6 +12,7 @@ import (
 
 	"github.com/bookpanda/minio-api/config"
 	"github.com/bookpanda/minio-api/constants"
+	"github.com/bookpanda/minio-api/internal/client"
 	fileHdr "github.com/bookpanda/minio-api/internal/handler/file"
 	healthcheck "github.com/bookpanda/minio-api/internal/health_check"
 	"github.com/bookpanda/minio-api/internal/middleware"
@@ -47,6 +48,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to Minio: %v", err))
 	}
+	client := client.NewClient(minioClient)
 
 	validator, err := validator.NewDtoValidator()
 	if err != nil {
@@ -59,7 +61,7 @@ func main() {
 
 	hcHandler := healthcheck.NewHandler()
 
-	fileRepo := fileRepo.NewRepository(conf.Store, minioClient)
+	fileRepo := fileRepo.NewRepository(&conf.Store, client)
 	fileSvc := fileSvc.NewService(fileRepo, logger)
 	fileHdr := fileHdr.NewHandler(fileSvc, validator, conf.App.MaxFileSizeMB, constants.AllowedContentType, logger)
 
