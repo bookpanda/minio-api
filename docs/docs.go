@@ -15,9 +15,76 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/upload": {
+        "/file/get/{bucket}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "specify the bucket and object key to get",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "file"
+                ],
+                "summary": "Get object url from minio",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Which bucket to get object from",
+                        "name": "bucket",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "object key to get",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/apperrors.AppError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/apperrors.AppError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/apperrors.AppError"
+                        }
+                    }
+                }
+            }
+        },
+        "/file/upload": {
             "post": {
-                "description": "get string by ID",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "specify the bucket and file to upload",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -54,19 +121,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.AppError"
+                            "$ref": "#/definitions/apperrors.AppError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.AppError"
+                            "$ref": "#/definitions/apperrors.AppError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.AppError"
+                            "$ref": "#/definitions/apperrors.AppError"
                         }
                     }
                 }
@@ -74,6 +141,25 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "apperrors.AppError": {
+            "type": "object",
+            "properties": {
+                "httpCode": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GetFileResponse": {
+            "type": "object",
+            "properties": {
+                "fileUrl": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UploadFileResponse": {
             "type": "object",
             "properties": {
@@ -84,17 +170,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "errors.AppError": {
-            "type": "object",
-            "properties": {
-                "httpCode": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -102,7 +185,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "minio.bookpanda.dev",
+	Host:             "localhost:3000",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Minio API",

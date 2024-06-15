@@ -26,8 +26,12 @@ import (
 // @version         1.0
 // @description     Object store API for personal projects
 
-// @host      minio.bookpanda.dev
+// @host      localhost:3000
 // @BasePath  /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	conf, err := config.LoadConfig()
 	if err != nil {

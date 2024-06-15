@@ -1,5 +1,17 @@
 basePath: /api/v1
 definitions:
+  apperrors.AppError:
+    properties:
+      httpCode:
+        type: integer
+      id:
+        type: string
+    type: object
+  dto.GetFileResponse:
+    properties:
+      fileUrl:
+        type: string
+    type: object
   dto.UploadFileResponse:
     properties:
       fileKey:
@@ -7,25 +19,58 @@ definitions:
       url:
         type: string
     type: object
-  errors.AppError:
-    properties:
-      httpCode:
-        type: integer
-      id:
-        type: string
-    type: object
-host: minio.bookpanda.dev
+host: localhost:3000
 info:
   contact: {}
   description: Object store API for personal projects
   title: Minio API
   version: "1.0"
 paths:
-  /api/v1/upload:
+  /file/get/{bucket}:
+    get:
+      consumes:
+      - text/plain
+      description: specify the bucket and object key to get
+      parameters:
+      - description: Which bucket to get object from
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: object key to get
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/apperrors.AppError'
+      security:
+      - BearerAuth: []
+      summary: Get object url from minio
+      tags:
+      - file
+  /file/upload:
     post:
       consumes:
       - multipart/form-data
-      description: get string by ID
+      description: specify the bucket and file to upload
       parameters:
       - description: Which bucket to upload to
         in: formData
@@ -47,16 +92,24 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.AppError'
+            $ref: '#/definitions/apperrors.AppError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.AppError'
+            $ref: '#/definitions/apperrors.AppError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.AppError'
+            $ref: '#/definitions/apperrors.AppError'
+      security:
+      - BearerAuth: []
       summary: Upload object to minio
       tags:
       - file
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
