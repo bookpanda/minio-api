@@ -62,6 +62,20 @@ func (mr *MockRepositoryMockRecorder) Get(bucketName, objectKey interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), bucketName, objectKey)
 }
 
+// GetURL mocks base method.
+func (m *MockRepository) GetURL(bucketName, objectKey string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetURL", bucketName, objectKey)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetURL indicates an expected call of GetURL.
+func (mr *MockRepositoryMockRecorder) GetURL(bucketName, objectKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetURL", reflect.TypeOf((*MockRepository)(nil).GetURL), bucketName, objectKey)
+}
+
 // Upload mocks base method.
 func (m *MockRepository) Upload(file []byte, bucketName, objectKey string) (string, string, error) {
 	m.ctrl.T.Helper()
