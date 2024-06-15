@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  minio-api:
+    container_name: minio-api
+    build: .
+    # depends_on:
+    #   - db
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - APP_PORT=3000
+      - APP_ENV=production
+      - APP_API_KEY=
+      - APP_MAX_FILE_SIZE=50
+      - STORE_ENDPOINT=
+      - STORE_ACCESS_KEY=
+      - STORE_SECRET_KEY=
+      - STORE_USE_SSL=true
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+    networks:
+      - miniostage
+
+
+networks:
+  minio: 
