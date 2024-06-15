@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/bookpanda/minio-api/config"
@@ -66,12 +67,17 @@ func (r *repositoryImpl) Get(bucketName string, objectKey string) (url string, e
 	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
 
-	_, err = r.minio.StatObject(ctx, bucketName, objectKey, minio.StatObjectOptions{})
+	url = r.getURL(bucketName, objectKey)
+
+	resp, err := http.Get(url)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("Couldn't get object %v/%v.", bucketName, objectKey))
 	}
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New(fmt.Sprintf("Object not found: %v/%v.", bucketName, objectKey))
+	}
 
-	return r.getURL(bucketName, objectKey), nil
+	return url, nil
 }
 
 func (c *repositoryImpl) getURL(bucketName string, objectKey string) string {
