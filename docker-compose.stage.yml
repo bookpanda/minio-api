@@ -4,8 +4,6 @@ services:
   minio-api:
     container_name: minio-api
     build: .
-    # depends_on:
-    #   - db
     restart: unless-stopped
     ports:
       - 3000:3000
