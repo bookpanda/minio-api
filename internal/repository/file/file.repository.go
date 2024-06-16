@@ -37,7 +37,7 @@ func NewRepository(conf *config.StoreConfig, storeClient store_client.Client, ht
 
 func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string) (url string, key string, err error) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	_, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
 
 	buffer := bytes.NewReader(file)
@@ -53,7 +53,7 @@ func (r *repositoryImpl) Upload(file []byte, bucketName string, objectKey string
 
 func (r *repositoryImpl) Delete(bucketName string, objectKey string) (err error) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	_, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
 
 	opts := minio.RemoveObjectOptions{
@@ -69,7 +69,7 @@ func (r *repositoryImpl) Delete(bucketName string, objectKey string) (err error)
 
 func (r *repositoryImpl) Get(bucketName string, objectKey string) (url string, err error) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 50*time.Second)
+	_, cancel := context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
 
 	url = r.GetURL(bucketName, objectKey)

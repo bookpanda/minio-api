@@ -15,7 +15,7 @@ func ExtractFile(file *multipart.FileHeader, allowedContent map[string]struct{},
 	}
 
 	if file.Size > maxSize*1000000000 {
-		return nil, errors.New(fmt.Sprintf("Max file size is %v", maxSize))
+		return nil, fmt.Errorf("Max file size is %v", maxSize)
 	}
 
 	fileBytes, err := file.Open()
@@ -35,10 +35,7 @@ func ExtractFile(file *multipart.FileHeader, allowedContent map[string]struct{},
 
 func isExisted(e map[string]struct{}, key string) bool {
 	_, ok := e[key]
-	if ok {
-		return true
-	}
-	return false
+	return ok
 }
 
 func mapToArr(m map[string]struct{}) []string {
