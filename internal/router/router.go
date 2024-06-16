@@ -13,6 +13,7 @@ type Router struct {
 	*gin.Engine
 	file        *gin.RouterGroup
 	healthCheck *gin.RouterGroup
+	metrics     *gin.RouterGroup
 }
 
 func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware middleware.AppMiddleware) *Router {
@@ -36,5 +37,8 @@ func New(conf *config.Config, corsHandler config.CorsHandler, appMiddleware midd
 	file := v1.Group("/file")
 	file.Use(gin.HandlerFunc(appMiddleware))
 
-	return &Router{r, file, healthCheck}
+	metrics := v1.Group("/metrics")
+	// metrics.Use(gin.HandlerFunc(appMiddleware))
+
+	return &Router{r, file, healthCheck, metrics}
 }
