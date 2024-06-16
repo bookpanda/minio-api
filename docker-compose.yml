@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
