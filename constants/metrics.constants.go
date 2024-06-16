@@ -24,16 +24,16 @@ func (m Method) String() string {
 	return string(m)
 }
 
-type StatusCode uint16
+// type StatusCode uint16
 
-const (
-	_200 StatusCode = 200
-	_400 StatusCode = 400
-	_401 StatusCode = 401
-	_404 StatusCode = 404
-	_500 StatusCode = 500
-)
+// const (
+// 	OK   StatusCode = 200
+// 	_400 StatusCode = 400
+// 	_401 StatusCode = 401
+// 	_404 StatusCode = 404
+// 	_500 StatusCode = 500
+// )
 
-func (s StatusCode) String() string {
-	return s.String()
-}
+// func (s StatusCode) String() string {
+// 	return s.String()
+// }

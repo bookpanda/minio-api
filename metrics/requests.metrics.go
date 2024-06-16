@@ -1,12 +1,14 @@
 package metrics
 
 import (
+	"fmt"
+
 	"github.com/bookpanda/minio-api/constants"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type RequestsMetrics interface {
-	AddRequest(domain constants.Domain, method constants.Method, statusCode constants.StatusCode)
+	AddRequest(domain constants.Domain, method constants.Method, statusCode int)
 	GetCounterVec() *prometheus.CounterVec
 }
 
@@ -20,8 +22,8 @@ func NewRequestsMetrics(requestsCounter *prometheus.CounterVec) RequestsMetrics 
 	}
 }
 
-func (m *requestsMetricsImpl) AddRequest(domain constants.Domain, method constants.Method, statusCode constants.StatusCode) {
-	m.requestsCounter.WithLabelValues(domain.String(), method.String(), statusCode.String()).Inc()
+func (m *requestsMetricsImpl) AddRequest(domain constants.Domain, method constants.Method, statusCode int) {
+	m.requestsCounter.WithLabelValues(domain.String(), method.String(), fmt.Sprint(statusCode)).Inc()
 }
 
 func (m *requestsMetricsImpl) GetCounterVec() *prometheus.CounterVec {

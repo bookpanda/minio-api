@@ -84,7 +84,7 @@ func (h *handlerImpl) Upload(c router.Context) {
 	res, apperr := h.svc.Upload(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to upload file to service", zap.Error(apperr))
-		h.requestsMetrics.AddRequest(constants.File, constants.POST, constants.StatusCode(apperr.HttpCode))
+		h.requestsMetrics.AddRequest(constants.File, constants.POST, apperr.HttpCode)
 		c.ResponseError(apperr)
 		return
 	}
@@ -132,7 +132,7 @@ func (h *handlerImpl) Get(c router.Context) {
 	res, apperr := h.svc.Get(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to get file from service", zap.Error(apperr))
-		h.requestsMetrics.AddRequest(constants.File, constants.GET, constants.StatusCode(apperr.HttpCode))
+		h.requestsMetrics.AddRequest(constants.File, constants.GET, apperr.HttpCode)
 		c.ResponseError(apperr)
 		return
 	}
@@ -187,7 +187,7 @@ func (h *handlerImpl) Delete(c router.Context) {
 	res, apperr := h.svc.Delete(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to delete file from service", zap.Error(apperr))
-		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, constants.StatusCode(apperr.HttpCode))
+		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, apperr.HttpCode)
 		c.ResponseError(apperr)
 		return
 	}

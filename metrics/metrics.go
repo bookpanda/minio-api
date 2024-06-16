@@ -20,11 +20,6 @@ func NewMetrics(registry *prometheus.Registry, requestsMetrics RequestsMetrics) 
 	// 	Buckets: prometheus.ExponentialBuckets(0.1, 1.5, 5),
 	// })
 
-	// requestsMetrics := prometheus.NewCounterVec(prometheus.CounterOpts{
-	// 	Name: "api_requests_total",
-	// 	Help: "Total number of API requests by domain, method and status code",
-	// }, []string{"domain", "method", "status_code"})
-
 	registry.MustRegister(
 		collectors.NewGoCollector(),
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),

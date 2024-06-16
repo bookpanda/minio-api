@@ -14,6 +14,7 @@ mock-gen:
 	mockgen -source ./internal/client/store/store.client.go -destination ./mocks/client/store/store.client.go
 	mockgen -source ./internal/router/context.go -destination ./mocks/router/context.go
 	mockgen -source ./internal/validator/validator.go -destination ./mocks/validator/validator.go
+	mockgen -source ./metrics/requests.metrics.go -destination ./mocks/metrics/requests.metrics.go
 
 test:
 	go vet ./...
