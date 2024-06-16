@@ -21,8 +21,11 @@ import (
 	fileSvc "github.com/bookpanda/minio-api/internal/service/file"
 	"github.com/bookpanda/minio-api/internal/validator"
 	"github.com/bookpanda/minio-api/logger"
+	"github.com/bookpanda/minio-api/metrics"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // @title           Minio API
@@ -61,15 +64,30 @@ func main() {
 	corsHandler := config.MakeCorsConfig(conf)
 	appMiddleware := middleware.NewAppMiddleware(&conf.App)
 
+	requestsCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "api_requests_total",
+		Help: "Total number of API requests by domain, method and status code",
+	}, []string{"domain", "method", "status_code"})
+	requestsMetrics := metrics.NewRequestsMetrics(requestsCounter)
+
+	metricsRegistry := prometheus.NewRegistry()
+	metrics := metrics.NewMetrics(metricsRegistry, requestsMetrics)
+
 	hcHandler := healthcheck.NewHandler()
 
 	fileRepo := fileRepo.NewRepository(&conf.Store, storeClient, httpClient)
 	fileSvc := fileSvc.NewService(fileRepo, logger)
-	fileHdr := fileHdr.NewHandler(fileSvc, validator, conf.App.MaxFileSizeMB, constants.AllowedContentType, logger)
+	fileHdr := fileHdr.NewHandler(fileSvc, validator, conf.App.MaxFileSizeMB, constants.AllowedContentType, logger, requestsMetrics)
 
 	r := router.New(conf, corsHandler, appMiddleware)
 
 	r.GetHealthCheck("/", hcHandler.HealthCheck)
+	r.GetMetrics("/", promhttp.HandlerFor(
+		metrics.Registry(),
+		promhttp.HandlerOpts{
+			EnableOpenMetrics: true,
+		}),
+	)
 	r.PostFile("/upload", fileHdr.Upload)
 	r.GetFile("/get/:bucket", fileHdr.Get)
 	r.DeleteFile("/delete/:bucket", fileHdr.Delete)

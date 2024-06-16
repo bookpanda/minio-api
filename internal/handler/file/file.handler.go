@@ -5,11 +5,13 @@ import (
 	"strings"
 
 	"github.com/bookpanda/minio-api/apperrors"
+	"github.com/bookpanda/minio-api/constants"
 	"github.com/bookpanda/minio-api/internal/dto"
 	"github.com/bookpanda/minio-api/internal/model"
 	"github.com/bookpanda/minio-api/internal/router"
 	"github.com/bookpanda/minio-api/internal/service/file"
 	"github.com/bookpanda/minio-api/internal/validator"
+	"github.com/bookpanda/minio-api/metrics"
 	"go.uber.org/zap"
 )
 
@@ -25,15 +27,17 @@ type handlerImpl struct {
 	maxFileSize        int64
 	allowedContentType map[string]struct{}
 	log                *zap.Logger
+	requestsMetrics    metrics.RequestsMetrics
 }
 
-func NewHandler(svc file.Service, validate validator.DtoValidator, maxFileSize int64, allowedContentType map[string]struct{}, log *zap.Logger) Handler {
+func NewHandler(svc file.Service, validate validator.DtoValidator, maxFileSize int64, allowedContentType map[string]struct{}, log *zap.Logger, requestsMetrics metrics.RequestsMetrics) Handler {
 	return &handlerImpl{
 		svc:                svc,
 		validate:           validate,
 		maxFileSize:        maxFileSize,
 		allowedContentType: allowedContentType,
 		log:                log,
+		requestsMetrics:    requestsMetrics,
 	}
 }
 
@@ -55,6 +59,7 @@ func (h *handlerImpl) Upload(c router.Context) {
 	bucket := c.PostForm("bucket")
 	if bucket == "" {
 		h.log.Named("file hdr").Error("bucket is required")
+		h.requestsMetrics.AddRequest(constants.File, constants.POST, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError("bucket is required"))
 		return
 	}
@@ -62,6 +67,7 @@ func (h *handlerImpl) Upload(c router.Context) {
 	file, err := c.FormFile("file", h.allowedContentType, h.maxFileSize)
 	if err != nil {
 		h.log.Named("file hdr").Error("failed to parse form file", zap.Error(err))
+		h.requestsMetrics.AddRequest(constants.File, constants.POST, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError(err.Error()))
 		return
 	}
@@ -78,10 +84,12 @@ func (h *handlerImpl) Upload(c router.Context) {
 	res, apperr := h.svc.Upload(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to upload file to service", zap.Error(apperr))
+		h.requestsMetrics.AddRequest(constants.File, constants.POST, constants.StatusCode(apperr.HttpCode))
 		c.ResponseError(apperr)
 		return
 	}
 
+	h.requestsMetrics.AddRequest(constants.File, constants.POST, http.StatusOK)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -103,6 +111,7 @@ func (h *handlerImpl) Get(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {
 		h.log.Named("file hdr").Error("bucket is required")
+		h.requestsMetrics.AddRequest(constants.File, constants.GET, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError("bucket route parameter is required"))
 		return
 	}
@@ -110,6 +119,7 @@ func (h *handlerImpl) Get(c router.Context) {
 	objectKey := c.Query("key")
 	if objectKey == "" {
 		h.log.Named("file hdr").Error("key query parameter is required")
+		h.requestsMetrics.AddRequest(constants.File, constants.GET, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError("key query parameter is required"))
 		return
 	}
@@ -122,10 +132,12 @@ func (h *handlerImpl) Get(c router.Context) {
 	res, apperr := h.svc.Get(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to get file from service", zap.Error(apperr))
+		h.requestsMetrics.AddRequest(constants.File, constants.GET, constants.StatusCode(apperr.HttpCode))
 		c.ResponseError(apperr)
 		return
 	}
 
+	h.requestsMetrics.AddRequest(constants.File, constants.GET, http.StatusOK)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -147,6 +159,7 @@ func (h *handlerImpl) Delete(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {
 		h.log.Named("file hdr").Error("bucket is required")
+		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError("bucket route parameter is required"))
 		return
 	}
@@ -154,12 +167,14 @@ func (h *handlerImpl) Delete(c router.Context) {
 	body := &dto.DeleteFileRequestBody{}
 	if err := c.Bind(body); err != nil {
 		h.log.Named("file hdr").Error("failed to bind request body", zap.Error(err))
+		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError(err.Error()))
 		return
 	}
 
 	if errorList := h.validate.Validate(body); errorList != nil {
 		h.log.Named("file hdr").Error("validation error", zap.Strings("errorList", errorList))
+		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, http.StatusBadRequest)
 		c.ResponseError(apperrors.BadRequestError(strings.Join(errorList, ", ")))
 		return
 	}
@@ -172,9 +187,11 @@ func (h *handlerImpl) Delete(c router.Context) {
 	res, apperr := h.svc.Delete(req)
 	if apperr != nil {
 		h.log.Named("file hdr").Error("failed to delete file from service", zap.Error(apperr))
+		h.requestsMetrics.AddRequest(constants.File, constants.DELETE, constants.StatusCode(apperr.HttpCode))
 		c.ResponseError(apperr)
 		return
 	}
 
+	h.requestsMetrics.AddRequest(constants.File, constants.DELETE, http.StatusOK)
 	c.JSON(http.StatusOK, res)
 }
