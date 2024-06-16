@@ -54,12 +54,14 @@ func NewHandler(svc file.Service, validate validator.DtoValidator, maxFileSize i
 func (h *handlerImpl) Upload(c router.Context) {
 	bucket := c.PostForm("bucket")
 	if bucket == "" {
+		h.log.Named("file hdr").Error("bucket is required")
 		c.ResponseError(apperrors.BadRequestError("bucket is required"))
 		return
 	}
 
 	file, err := c.FormFile("file", h.allowedContentType, h.maxFileSize)
 	if err != nil {
+		h.log.Named("file hdr").Error("failed to parse form file", zap.Error(err))
 		c.ResponseError(apperrors.BadRequestError(err.Error()))
 		return
 	}
@@ -75,6 +77,7 @@ func (h *handlerImpl) Upload(c router.Context) {
 
 	res, apperr := h.svc.Upload(req)
 	if apperr != nil {
+		h.log.Named("file hdr").Error("failed to upload file to service", zap.Error(apperr))
 		c.ResponseError(apperr)
 		return
 	}
@@ -99,12 +102,14 @@ func (h *handlerImpl) Upload(c router.Context) {
 func (h *handlerImpl) Get(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {
+		h.log.Named("file hdr").Error("bucket is required")
 		c.ResponseError(apperrors.BadRequestError("bucket route parameter is required"))
 		return
 	}
 
 	objectKey := c.Query("key")
 	if objectKey == "" {
+		h.log.Named("file hdr").Error("key query parameter is required")
 		c.ResponseError(apperrors.BadRequestError("key query parameter is required"))
 		return
 	}
@@ -116,6 +121,7 @@ func (h *handlerImpl) Get(c router.Context) {
 
 	res, apperr := h.svc.Get(req)
 	if apperr != nil {
+		h.log.Named("file hdr").Error("failed to get file from service", zap.Error(apperr))
 		c.ResponseError(apperr)
 		return
 	}
@@ -140,17 +146,20 @@ func (h *handlerImpl) Get(c router.Context) {
 func (h *handlerImpl) Delete(c router.Context) {
 	bucket := c.Param("bucket")
 	if bucket == "" {
+		h.log.Named("file hdr").Error("bucket is required")
 		c.ResponseError(apperrors.BadRequestError("bucket route parameter is required"))
 		return
 	}
 
 	body := &dto.DeleteFileRequestBody{}
 	if err := c.Bind(body); err != nil {
+		h.log.Named("file hdr").Error("failed to bind request body", zap.Error(err))
 		c.ResponseError(apperrors.BadRequestError(err.Error()))
 		return
 	}
 
 	if errorList := h.validate.Validate(body); errorList != nil {
+		h.log.Named("file hdr").Error("validation error", zap.Strings("errorList", errorList))
 		c.ResponseError(apperrors.BadRequestError(strings.Join(errorList, ", ")))
 		return
 	}
@@ -162,6 +171,7 @@ func (h *handlerImpl) Delete(c router.Context) {
 
 	res, apperr := h.svc.Delete(req)
 	if apperr != nil {
+		h.log.Named("file hdr").Error("failed to delete file from service", zap.Error(apperr))
 		c.ResponseError(apperr)
 		return
 	}

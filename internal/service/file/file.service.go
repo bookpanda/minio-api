@@ -62,6 +62,7 @@ func (s *serviceImpl) Get(req *dto.GetFileRequest) (res *dto.GetFileResponse, ap
 		return nil, apperrors.InternalServerError(fmt.Sprintf("Couldn't get object %v/%v.", req.Bucket, req.FileKey))
 	}
 	if url == "" {
+		s.log.Named("file svc").Error(fmt.Sprintf("Couldn't find object %v/%v.", req.Bucket, req.FileKey))
 		return nil, apperrors.NotFoundError(fmt.Sprintf("Couldn't find object %v/%v.", req.Bucket, req.FileKey))
 	}
 
