@@ -5,7 +5,32 @@ services:
     container_name: prometheus
     image: prom/prometheus
     restart: unless-stopped
+    networks:
+      - proxy
+
     ports:
       - 9090:9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    networks:
+      - proxy
+      
+    ports:
+      - 3001:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=1234
+
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  grafana-data: {}
