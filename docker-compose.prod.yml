@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   minio-api:
-    image: ghcr.io/bookpanda/minio-api:15f48bec6fae368a4c1b79836384e54f0a56e8a9
+    image: ghcr.io/bookpanda/minio-api:e84a3db5b8034944c1a0fa7939f53d988c807440
     container_name: minio-api
     restart: unless-stopped
     networks:
@@ -14,7 +14,7 @@ services:
       - APP_PORT=3000
       - APP_ENV=production
       - APP_API_KEY=1234
-      - APP_MAX_FILE_SIZE=50
+      - APP_MAX_FILE_SIZE_MB=50
       - STORE_ENDPOINT=
       - STORE_ACCESS_KEY=
       - STORE_SECRET_KEY=
