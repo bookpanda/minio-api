@@ -25,8 +25,8 @@ services:
   #     command: ["air"]
 
   prometheus:
-    container_name: prometheus
     image: prom/prometheus
+    container_name: prometheus
     restart: unless-stopped
     # depends_on:
     #   - minio-api
