@@ -32,9 +32,11 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	err := godotenv.Load(".env")
-	if err != nil {
-		return nil, err
+	if os.Getenv("APP_ENV") == "development" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	maxFileSizeMB, err := strconv.ParseInt(os.Getenv("APP_MAX_FILE_SIZE_MB"), 10, 64)
