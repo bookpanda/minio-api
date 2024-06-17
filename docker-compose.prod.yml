@@ -1,10 +1,33 @@
 version: "3.9"
 
 services:
+  minio-api:
+    image: ghcr.io/bookpanda/minio-api:15f48bec6fae368a4c1b79836384e54f0a56e8a9
+    container_name: minio-api
+    restart: unless-stopped
+    networks:
+      - proxy
+
+    ports:
+      - 3000:3000
+    environment:
+      - APP_PORT=3000
+      - APP_ENV=production
+      - APP_API_KEY=1234
+      - APP_MAX_FILE_SIZE=50
+      - STORE_ENDPOINT=
+      - STORE_ACCESS_KEY=
+      - STORE_SECRET_KEY=
+      - STORE_USE_SSL=true
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+    
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     restart: unless-stopped
+    depends_on:
+      - minio-api
     networks:
       - proxy
 
