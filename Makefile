@@ -5,10 +5,10 @@ server:
 	go run cmd/main.go
 
 stage:
-	docker-compose -f docker-compose.stage.yaml up
+	docker-compose -f docker-compose.stage.yml up
 
 prod:
-	docker-compose -f docker-compose.prod.yaml up
+	docker-compose -f docker-compose.prod.yml up
 
 mock-gen:
 	mockgen -source ./internal/repository/file/file.repository.go -destination ./mocks/repository/file.repository.go
